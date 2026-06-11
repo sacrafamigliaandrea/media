@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rubrica Valutativa - Esame di Stato Primo Ciclo</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --accent-color: #e74c3c;
+            --light-gray: #f8f9fa;
+            --dark-gray: #343a40;
+            --success-color: #27ae60;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            background-color: #f5f7fa;
+            color: var(--primary-color);
+            line-height: 1.6;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            overflow: hidden;
+        }
+
+        .header {
+            background: var(--primary-color);
+            color: white;
+            padding: 25px 30px;
+            text-align: center;
+            border-bottom: 4px solid var(--secondary-color);
+        }
+
+        .header h1 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .header p {
+            font-size: 1rem;
+            opacity: 0.9;
+        }
+
+        .content-wrapper {
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+        }
+
+        @media (min-width: 992px) {
+            .content-wrapper {
+                flex-direction: row;
+            }
+        }
+
+        .rubric-section {
+            flex: 1;
+            padding: 15px;
+        }
+
+        .chart-section {
+            flex: 1;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .chart-container {
+            width: 100%;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .evaluation-row {
+            margin-bottom: 15px;
+            padding: 15px;
+            background: var(--light-gray);
+            border-radius: 10px;
+            transition: all 0.2s ease;
+        }
+
+        .evaluation-row:hover {
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        }
+
+        .criterion {
+            font-weight: 500;
+            font-size: 0.95rem;
+            margin-bottom: 10px;
+        }
+
+        .score-buttons {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+        }
+
+        .score-btn {
+            width: 40px;
+            height: 40px;
+            border: 2px solid #ddd;
+            background: white;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .score-btn:hover {
+            border-color: var(--secondary-color);
+            transform: scale(1.05);
+        }
+
+        .score-btn.selected {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .descriptors {
+            font-size: 0.8rem;
+            color: var(--dark-gray);
+            margin-top: 5px;
+            padding: 8px;
+            background: rgba(255,255,255,0.7);
+            border-radius: 6px;
+            display: none;
+        }
+
+        .vote-display {
+            min-width: 50px;
+            height: 40px;
+            background: var(--primary-color);
+            color: white;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin-left: auto;
+        }
+
+        .summary-section {
+            background: var(--primary-color);
+            color: white;
+            padding: 25px;
+            text-align: center;
+            border-top: 4px solid var(--secondary-color);
+        }
+
+        .average-display {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: white;
+        }
+
+        .summary-text {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            margin-bottom: 15px;
+        }
+
+        .reset-btn {
+            background: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .reset-btn:hover {
+            background: #c0392b;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .section-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid var(--secondary-color);
+        }
+
+        .row-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            cursor: pointer;
+        }
+
+        @media (max-width: 768px) {
+            .score-buttons {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>ESAME DI STATO - PRIMO CICLO</h1>
+            <p>Rubrica valutativa per il colloquio orale</p>
+        </div>
+
+        <div class="content-wrapper">
+            <div class="rubric-section">
+                <h2 class="section-title">Criteri di Valutazione</h2>
+                
+                <div class="evaluation-row">
+                    <div class="row-header" onclick="toggleDescriptors(0)">
+                        <div class="criterion">Capacità di argomentazione attraverso l'uso della lingua</div>
+                        <div class="vote-display" id="vote-0">-</div>
+                    </div>
+                    <div class="score-buttons">
+                        <button class="score-btn" data-criterion="0" data-score="10">10</button>
+                        <button class="score-btn" data-criterion="0" data-score="9">9</button>
+                        <button class="score-btn" data-criterion="0" data-score="8">8</button>
+                        <button class="score-btn" data-criterion="0" data-score="7">7</button>
+                        <button class="score-btn" data-criterion="0" data-score="6">6</button>
+                        <button class="score-btn" data-criterion="0" data-score="5">5</button>
+                        <button class="score-btn" data-criterion="0" data-score="4">4</button>
+                    </div>
+                    <div class="descriptors" id="descriptors-0">
+                        <p><strong>10:</strong> Argomentazione ricca, articolata e originale con padronanza linguistica eccellente</p>
+                        <p><strong>8-9:</strong> Argomentazione chiara e coerente con buona padronanza linguistica</p>
+                        <p><strong>6-7:</strong> Argomentazione sufficientemente chiara con padronanza linguistica adeguata</p>
+                        <p><strong>4-5:</strong> Argomentazione poco chiara con padronanza linguistica limitata</p>
+                    </div>
+                </div>
+
+                <div class="evaluation-row">
+                    <div class="row-header" onclick="toggleDescriptors(1)">
+                        <div class="criterion">Risoluzione dei problemi</div>
+                        <div class="vote-display" id="vote-1">-</div>
+                    </div>
+                    <div class="score-buttons">
+                        <button class="score-btn" data-criterion="1" data-score="10">10</button>
+                        <button class="score-btn" data-criterion="1" data-score="9">9</button>
+                        <button class="score-btn" data-criterion="1" data-score="8">8</button>
+                        <button class="score-btn" data-criterion="1" data-score="7">7</button>
+                        <button class="score-btn" data-criterion="1" data-score="6">6</button>
+                        <button class="score-btn" data-criterion="1" data-score="5">5</button>
+                        <button class="score-btn" data-criterion="1" data-score="4">4</button>
+                    </div>
+                    <div class="descriptors" id="descriptors-1">
+                        <p><strong>10:</strong> Risoluzione creativa ed efficace con strategie innovative</p>
+                        <p><strong>8-9:</strong> Risoluzione corretta con strategie appropriate</p>
+                        <p><strong>6-7:</strong> Risoluzione parzialmente corretta con strategie semplici</p>
+                        <p><strong>4-5:</strong> Difficoltà nella risoluzione con strategie inadeguate</p>
+                    </div>
+                </div>
+
+                <div class="evaluation-row">
+                    <div class="row-header" onclick="toggleDescriptors(2)">
+                        <div class="criterion">Pensiero critico e riflessivo</div>
+                        <div class="vote-display" id="vote-2">-</div>
+                    </div>
+                    <div class="score-buttons">
+                        <button class="score-btn" data-criterion="2" data-score="10">10</button>
+                        <button class="score-btn" data-criterion="2" data-score="9">9</button>
+                        <button class="score-btn" data-criterion="2" data-score="8">8</button>
+                        <button class="score-btn" data-criterion="2" data-score="7">7</button>
+                        <button class="score-btn" data-criterion="2" data-score="6">6</button>
+                        <button class="score-btn" data-criterion="2" data-score="5">5</button>
+                        <button class="score-btn" data-criterion="2" data-score="4">4</button>
+                    </div>
+                    <div class="descriptors" id="descriptors-2">
+                        <p><strong>10:</strong> Analisi approfondita con riflessioni originali e autonome</p>
+                        <p><strong>8-9:</strong> Analisi corretta con riflessioni pertinenti</p>
+                        <p><strong>6-7:</strong> Analisi essenziale con riflessioni guidate</p>
+                        <p><strong>4-5:</strong> Analisi superficiale con riflessioni limitate</p>
+                    </div>
+                </div>
+
+                <div class="evaluation-row">
+                    <div class="row-header" onclick="toggleDescriptors(3)">
+                        <div class="criterion">Collegamento organico e significativo tra le varie discipline</div>
+                        <div class="vote-display" id="vote-3">-</div>
+                    </div>
+                    <div class="score-buttons">
+                        <button class="score-btn" data-criterion="3" data-score="10">10</button>
+                        <button class="score-btn" data-criterion="3" data-score="9">9</button>
+                        <button class="score-btn" data-criterion="3" data-score="8">8</button>
+                        <button class="score-btn" data-criterion="3" data-score="7">7</button>
+                        <button class="score-btn" data-criterion="3" data-score="6">6</button>
+                        <button class="score-btn" data-criterion="3" data-score="5">5</button>
+                        <button class="score-btn" data-criterion="3" data-score="4">4</button>
+                    </div>
+                    <div class="descriptors" id="descriptors-3">
+                        <p><strong>10:</strong> Collegamenti multidisciplinari ricchi, pertinenti e originali</p>
+                        <p><strong>8-9:</strong> Collegamenti multidisciplinari corretti e significativi</p>
+                        <p><strong>6-7:</strong> Collegamenti multidisciplinari essenziali</p>
+                        <p><strong>4-5:</strong> Collegamenti multidisciplinari frammentari o assenti</p>
+                    </div>
+                </div>
+
+                <div class="evaluation-row">
+                    <div class="row-header" onclick="toggleDescriptors(4)">
+                        <div class="criterion">Competenze nell'uso delle lingue straniere</div>
+                        <div class="vote-display" id="vote-4">-</div>
+                    </div>
+                    <div class="score-buttons">
+                        <button class="score-btn" data-criterion="4" data-score="10">10</button>
+                        <button class="score-btn" data-criterion="4" data-score="9">9</button>
+                        <button class="score-btn" data-criterion="4" data-score="8">8</button>
+                        <button class="score-btn" data-criterion="4" data-score="7">7</button>
+                        <button class="score-btn" data-criterion="4" data-score="6">6</button>
+                        <button class="score-btn" data-criterion="4" data-score="5">5</button>
+                        <button class="score-btn" data-criterion="4" data-score="4">4</button>
+                    </div>
+                    <div class="descriptors" id="descriptors-4">
+                        <p><strong>10:</strong> Padronanza eccellente con espressione fluente e corretta</p>
+                        <p><strong>8-9:</strong> Padronanza buona con espressione corretta</p>
+                        <p><strong>6-7:</strong> Padronanza sufficiente con espressione essenziale</p>
+                        <p><strong>4-5:</strong> Padronanza limitata con espressione frammentaria</p>
+                    </div>
+                </div>
+
+                <div class="evaluation-row">
+                    <div class="row-header" onclick="toggleDescriptors(5)">
+                        <div class="criterion">Competenza in educazione civica</div>
+                        <div class="vote-display" id="vote-5">-</div>
+                    </div>
+                    <div class="score-buttons">
+                        <button class="score-btn" data-criterion="5" data-score="10">10</button>
+                        <button class="score-btn" data-criterion="5" data-score="9">9</button>
+                        <button class="score-btn" data-criterion="5" data-score="8">8</button>
+                        <button class="score-btn" data-criterion="5" data-score="7">7</button>
+                        <button class="score-btn" data-criterion="5" data-score="6">6</button>
+                        <button class="score-btn" data-criterion="5" data-score="5">5</button>
+                        <button class="score-btn" data-criterion="5" data-score="4">4</button>
+                    </div>
+                    <div class="descriptors" id="descriptors-5">
+                        <p><strong>10:</strong> Competenza eccellente con analisi critica e proposta originale</p>
+                        <p><strong>8-9:</strong> Competenza buona con analisi corretta</p>
+                        <p><strong>6-7:</strong> Competenza sufficiente con analisi essenziale</p>
+                        <p><strong>4-5:</strong> Competenza limitata con analisi superficiale</p>
+                    </div>
+                </div>
+
+                <div class="evaluation-row">
+                    <div class="row-header" onclick="toggleDescriptors(6)">
+                        <div class="criterion">Elaborato digitale (+ eventuale artefatto)</div>
+                        <div class="vote-display" id="vote-6">-</div>
+                    </div>
+                    <div class="score-buttons">
+                        <button class="score-btn" data-criterion="6" data-score="10">10</button>
+                        <button class="score-btn" data-criterion="6" data-score="9">9</button>
+                        <button class="score-btn" data-criterion="6" data-score="8">8</button>
+                        <button class="score-btn" data-criterion="6" data-score="7">7</button>
+                        <button class="score-btn" data-criterion="6" data-score="6">6</button>
+                        <button class="score-btn" data-criterion="6" data-score="5">5</button>
+                        <button class="score-btn" data-criterion="6" data-score="4">4</button>
+                    </div>
+                    <div class="descriptors" id="descriptors-6">
+                        <p><strong>10:</strong> Elaborato originale, ben strutturato e con contenuti approfonditi</p>
+                        <p><strong>8-9:</strong> Elaborato ben strutturato con contenuti validi</p>
+                        <p><strong>6-7:</strong> Elaborato sufficientemente strutturato con contenuti essenziali</p>
+                        <p><strong>4-5:</strong> Elaborato poco strutturato con contenuti limitati</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="chart-section">
+                <h2 class="section-title">Profilo delle Competenze</h2>
+                <div class="chart-container">
+                    <canvas id="radarChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="summary-section">
+            <div class="average-display" id="average">-</div>
+            <div class="summary-text">Voto finale del colloquio</div>
+            <button class="reset-btn" onclick="resetAll()">Azzera valutazione</button>
+        </div>
+    </div>
+
+    <script>
+        let scores = {};
+        const criteriaLabels = [
+            'Argomentazione',
+            'Risoluzione problemi',
+            'Pensiero critico',
+            'Collegamento discipline',
+            'Lingue straniere',
+            'Educazione civica',
+            'Elaborato digitale'
+        ];
+        
+        // Initialize radar chart
+        const ctx = document.getElementById('radarChart').getContext('2d');
+        const radarChart = new Chart(ctx, {
+            type: 'radar',
+            data: {
+                labels: criteriaLabels,
+                datasets: [{
+                    label: 'Competenze',
+                    data: [4, 4, 4, 4, 4, 4, 4],
+                    backgroundColor: 'rgba(52, 152, 219, 0.2)',
+                    borderColor: 'rgba(52, 152, 219, 1)',
+                    borderWidth: 2,
+                    pointBackgroundColor: 'rgba(52, 152, 219, 1)',
+                    pointRadius: 4
+                }]
+            },
+            options: {
+                scales: {
+                    r: {
+                        angleLines: {
+                            display: true
+                        },
+                        suggestedMin: 4,
+                        suggestedMax: 10,
+                        ticks: {
+                            stepSize: 1,
+                            callback: function(value) {
+                                if (value === 4 || value === 6 || value === 8 || value === 10) {
+                                    return value;
+                                }
+                            }
+                        }
+                    }
+                },
+                elements: {
+                    line: {
+                        tension: 0.1
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                }
+            }
+        });
+        
+        function toggleDescriptors(index) {
+            const descriptors = document.getElementById(`descriptors-${index}`);
+            descriptors.style.display = descriptors.style.display === 'block' ? 'none' : 'block';
+        }
+        
+        function updateScore(criterion, score) {
+            // Remove selection from all buttons in this criterion
+            const buttons = document.querySelectorAll(`[data-criterion="${criterion}"]`);
+            buttons.forEach(btn => btn.classList.remove('selected'));
+            
+            // Add selection to clicked button
+            event.target.classList.add('selected');
+            
+            // Update score
+            scores[criterion] = score;
+            
+            // Update vote display
+            document.getElementById(`vote-${criterion}`).textContent = score;
+            
+            // Update radar chart
+            updateRadarChart();
+            
+            // Update average
+            updateAverage();
+        }
+        
+        function updateRadarChart() {
+            const data = [];
+            for (let i = 0; i < criteriaLabels.length; i++) {
+                data.push(scores[i] || 4);
+            }
+            radarChart.data.datasets[0].data = data;
+            radarChart.update();
+        }
+        
+        function updateAverage() {
+            const validScores = Object.values(scores).filter(score => score !== null);
+            
+            if (validScores.length === 0) {
+                document.getElementById('average').textContent = '-';
+                return;
+            }
+            
+            const sum = validScores.reduce((acc, score) => acc + score, 0);
+            const average = (sum / validScores.length).toFixed(1);
+            
+            document.getElementById('average').textContent = average;
+        }
+        
+        function resetAll() {
+            // Clear scores
+            scores = {};
+            
+            // Remove all selections
+            document.querySelectorAll('.score-btn').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            
+            // Reset vote displays
+            for (let i = 0; i < 7; i++) {
+                document.getElementById(`vote-${i}`).textContent = '-';
+            }
+            
+            // Reset average
+            document.getElementById('average').textContent = '-';
+            
+            // Reset radar chart
+            radarChart.data.datasets[0].data = [4, 4, 4, 4, 4, 4, 4];
+            radarChart.update();
+            
+            // Hide all descriptors
+            document.querySelectorAll('.descriptors').forEach(el => {
+                el.style.display = 'none';
+            });
+        }
+        
+        // Add event listeners to all score buttons
+        document.querySelectorAll('.score-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const criterion = parseInt(e.target.dataset.criterion);
+                const score = parseInt(e.target.dataset.score);
+                updateScore(criterion, score);
+            });
+        });
+    </script>
+</body>
+</html>
