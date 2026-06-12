@@ -2,9 +2,8 @@
 <html lang="it">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Rubrica Valutativa - Esame di Stato Primo Ciclo</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
             --primary-color: #2c3e50;
@@ -19,492 +18,405 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            /* Previene la selezione accidentale del testo durante il touch sui bottoni */
+            user-select: none; 
         }
 
         body {
-            font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
-            background-color: #f5f7fa;
+            font-family: '-apple-system', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: #e2e8f0;
             color: var(--primary-color);
-            line-height: 1.6;
-            padding: 20px;
-            min-height: 100vh;
+            /* Forza la pagina ad occupare esattamente l'altezza dello schermo, impedendo lo scroll */
+            height: 100dvh; 
+            width: 100vw;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 12px;
         }
 
         .container {
-            max-width: 1200px;
-            margin: 0 auto;
+            width: 100%;
+            height: 100%;
             background: white;
-            border-radius: 12px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
             overflow: hidden;
         }
 
         .header {
             background: var(--primary-color);
             color: white;
-            padding: 25px 30px;
+            padding: 15px 20px;
             text-align: center;
             border-bottom: 4px solid var(--secondary-color);
+            flex-shrink: 0;
         }
 
         .header h1 {
-            font-size: 1.8rem;
-            font-weight: 600;
-            margin-bottom: 5px;
+            font-size: 1.6rem;
+            font-weight: 700;
+            margin-bottom: 4px;
         }
 
         .header p {
-            font-size: 1rem;
+            font-size: 1.1rem;
             opacity: 0.9;
         }
 
-        .content-wrapper {
-            display: flex;
-            flex-direction: column;
-            padding: 20px;
-        }
-
-        @media (min-width: 992px) {
-            .content-wrapper {
-                flex-direction: row;
-            }
-        }
-
         .rubric-section {
-            flex: 1;
-            padding: 15px;
-        }
-
-        .chart-section {
-            flex: 1;
-            padding: 15px;
+            flex-grow: 1;
             display: flex;
             flex-direction: column;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .chart-container {
-            width: 100%;
-            max-width: 500px;
-            margin: 0 auto;
+            justify-content: space-evenly; /* Distribuisce le righe equamente nello spazio verticale */
+            padding: 10px 20px;
         }
 
         .evaluation-row {
-            margin-bottom: 15px;
-            padding: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 18px;
             background: var(--light-gray);
-            border-radius: 10px;
-            transition: all 0.2s ease;
+            border-radius: 12px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.02);
         }
 
-        .evaluation-row:hover {
-            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        .row-header {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            flex: 1;
+            padding-right: 15px;
         }
 
         .criterion {
-            font-weight: 500;
-            font-size: 0.95rem;
-            margin-bottom: 10px;
+            font-weight: 600;
+            font-size: 1.15rem;
+            line-height: 1.3;
+            color: var(--primary-color);
+        }
+
+        .info-icon {
+            color: var(--secondary-color);
+            margin-left: 8px;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+
+        .controls-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 20px;
         }
 
         .score-buttons {
             display: flex;
-            gap: 8px;
-            margin-bottom: 10px;
-            flex-wrap: wrap;
+            gap: 10px;
         }
 
+        /* Pulsanti touch-friendly per iPad (grandi) */
         .score-btn {
-            width: 40px;
-            height: 40px;
-            border: 2px solid #ddd;
+            width: 55px;
+            height: 55px;
+            border: 2px solid #cbd5e1;
             background: white;
-            border-radius: 8px;
-            font-size: 1rem;
-            font-weight: 600;
+            border-radius: 12px;
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--primary-color);
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: all 0.15s ease;
             display: flex;
             align-items: center;
             justify-content: center;
         }
 
-        .score-btn:hover {
-            border-color: var(--secondary-color);
-            transform: scale(1.05);
+        .score-btn:active {
+            transform: scale(0.95);
         }
 
         .score-btn.selected {
             background: var(--primary-color);
             color: white;
             border-color: var(--primary-color);
-        }
-
-        .descriptors {
-            font-size: 0.8rem;
-            color: var(--dark-gray);
-            margin-top: 5px;
-            padding: 8px;
-            background: rgba(255,255,255,0.7);
-            border-radius: 6px;
-            display: none;
+            box-shadow: 0 4px 10px rgba(44, 62, 80, 0.3);
         }
 
         .vote-display {
-            min-width: 50px;
-            height: 40px;
-            background: var(--primary-color);
+            width: 60px;
+            height: 60px;
+            background: var(--secondary-color);
             color: white;
-            border-radius: 8px;
+            border-radius: 14px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.1rem;
-            font-weight: bold;
-            margin-left: auto;
+            font-size: 1.6rem;
+            font-weight: 800;
+            box-shadow: inset 0 -3px 0 rgba(0,0,0,0.1);
         }
 
         .summary-section {
             background: var(--primary-color);
             color: white;
-            padding: 25px;
-            text-align: center;
+            padding: 15px 30px;
             border-top: 4px solid var(--secondary-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-shrink: 0;
+        }
+
+        .summary-info {
+            display: flex;
+            align-items: center;
+            gap: 20px;
         }
 
         .average-display {
-            font-size: 2.5rem;
-            font-weight: bold;
-            margin-bottom: 10px;
+            font-size: 2.8rem;
+            font-weight: 800;
             color: white;
+            background: rgba(255,255,255,0.1);
+            padding: 5px 20px;
+            border-radius: 12px;
+            min-width: 100px;
+            text-align: center;
         }
 
         .summary-text {
-            font-size: 1.1rem;
+            font-size: 1.3rem;
+            font-weight: 500;
             opacity: 0.9;
-            margin-bottom: 15px;
         }
 
         .reset-btn {
             background: var(--accent-color);
             color: white;
             border: none;
-            padding: 12px 25px;
-            border-radius: 25px;
-            font-size: 1rem;
-            font-weight: 600;
+            padding: 16px 30px;
+            border-radius: 30px;
+            font-size: 1.2rem;
+            font-weight: 700;
             cursor: pointer;
-            transition: all 0.2s ease;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
         }
 
-        .reset-btn:hover {
+        .reset-btn:active {
             background: #c0392b;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            transform: translateY(2px);
+            box-shadow: 0 2px 3px rgba(0,0,0,0.2);
         }
 
-        .section-title {
-            font-size: 1.3rem;
-            font-weight: 600;
+        /* --- STILI PER IL MODAL DEI DESCRITTORI --- */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.6);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            backdrop-filter: blur(3px);
+        }
+
+        .modal-content {
+            background: white;
+            width: 80%;
+            max-width: 600px;
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.3);
+            position: relative;
+        }
+
+        .modal-title {
+            font-size: 1.4rem;
             color: var(--primary-color);
             margin-bottom: 20px;
-            padding-bottom: 8px;
+            padding-bottom: 10px;
             border-bottom: 2px solid var(--secondary-color);
         }
 
-        .row-header {
-            display: flex;
-            align-items: center;
-            margin-bottom: 10px;
-            cursor: pointer;
+        .modal-body p {
+            margin-bottom: 12px;
+            font-size: 1.15rem;
+            line-height: 1.5;
+            color: var(--dark-gray);
         }
 
-        @media (max-width: 768px) {
-            .score-buttons {
-                justify-content: center;
-            }
+        .modal-body p strong {
+            color: var(--primary-color);
+            display: inline-block;
+            width: 45px;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: #f1f5f9;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--dark-gray);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
     </style>
 </head>
 <body>
+
     <div class="container">
         <div class="header">
             <h1>ESAME DI STATO - PRIMO CICLO</h1>
             <p>Rubrica valutativa per il colloquio orale</p>
         </div>
 
-        <div class="content-wrapper">
-            <div class="rubric-section">
-                <h2 class="section-title">Criteri di Valutazione</h2>
-                
-                <div class="evaluation-row">
-                    <div class="row-header" onclick="toggleDescriptors(0)">
-                        <div class="criterion">Capacità di argomentazione attraverso l'uso della lingua</div>
-                        <div class="vote-display" id="vote-0">-</div>
-                    </div>
-                    <div class="score-buttons">
-                        <button class="score-btn" data-criterion="0" data-score="10">10</button>
-                        <button class="score-btn" data-criterion="0" data-score="9">9</button>
-                        <button class="score-btn" data-criterion="0" data-score="8">8</button>
-                        <button class="score-btn" data-criterion="0" data-score="7">7</button>
-                        <button class="score-btn" data-criterion="0" data-score="6">6</button>
-                        <button class="score-btn" data-criterion="0" data-score="5">5</button>
-                        <button class="score-btn" data-criterion="0" data-score="4">4</button>
-                    </div>
-                    <div class="descriptors" id="descriptors-0">
-                        <p><strong>10:</strong> Argomentazione ricca, articolata e originale con padronanza linguistica eccellente</p>
-                        <p><strong>8-9:</strong> Argomentazione chiara e coerente con buona padronanza linguistica</p>
-                        <p><strong>6-7:</strong> Argomentazione sufficientemente chiara con padronanza linguistica adeguata</p>
-                        <p><strong>4-5:</strong> Argomentazione poco chiara con padronanza linguistica limitata</p>
-                    </div>
-                </div>
-
-                <div class="evaluation-row">
-                    <div class="row-header" onclick="toggleDescriptors(1)">
-                        <div class="criterion">Risoluzione dei problemi</div>
-                        <div class="vote-display" id="vote-1">-</div>
-                    </div>
-                    <div class="score-buttons">
-                        <button class="score-btn" data-criterion="1" data-score="10">10</button>
-                        <button class="score-btn" data-criterion="1" data-score="9">9</button>
-                        <button class="score-btn" data-criterion="1" data-score="8">8</button>
-                        <button class="score-btn" data-criterion="1" data-score="7">7</button>
-                        <button class="score-btn" data-criterion="1" data-score="6">6</button>
-                        <button class="score-btn" data-criterion="1" data-score="5">5</button>
-                        <button class="score-btn" data-criterion="1" data-score="4">4</button>
-                    </div>
-                    <div class="descriptors" id="descriptors-1">
-                        <p><strong>10:</strong> Risoluzione creativa ed efficace con strategie innovative</p>
-                        <p><strong>8-9:</strong> Risoluzione corretta con strategie appropriate</p>
-                        <p><strong>6-7:</strong> Risoluzione parzialmente corretta con strategie semplici</p>
-                        <p><strong>4-5:</strong> Difficoltà nella risoluzione con strategie inadeguate</p>
-                    </div>
-                </div>
-
-                <div class="evaluation-row">
-                    <div class="row-header" onclick="toggleDescriptors(2)">
-                        <div class="criterion">Pensiero critico e riflessivo</div>
-                        <div class="vote-display" id="vote-2">-</div>
-                    </div>
-                    <div class="score-buttons">
-                        <button class="score-btn" data-criterion="2" data-score="10">10</button>
-                        <button class="score-btn" data-criterion="2" data-score="9">9</button>
-                        <button class="score-btn" data-criterion="2" data-score="8">8</button>
-                        <button class="score-btn" data-criterion="2" data-score="7">7</button>
-                        <button class="score-btn" data-criterion="2" data-score="6">6</button>
-                        <button class="score-btn" data-criterion="2" data-score="5">5</button>
-                        <button class="score-btn" data-criterion="2" data-score="4">4</button>
-                    </div>
-                    <div class="descriptors" id="descriptors-2">
-                        <p><strong>10:</strong> Analisi approfondita con riflessioni originali e autonome</p>
-                        <p><strong>8-9:</strong> Analisi corretta con riflessioni pertinenti</p>
-                        <p><strong>6-7:</strong> Analisi essenziale con riflessioni guidate</p>
-                        <p><strong>4-5:</strong> Analisi superficiale con riflessioni limitate</p>
-                    </div>
-                </div>
-
-                <div class="evaluation-row">
-                    <div class="row-header" onclick="toggleDescriptors(3)">
-                        <div class="criterion">Collegamento organico e significativo tra le varie discipline</div>
-                        <div class="vote-display" id="vote-3">-</div>
-                    </div>
-                    <div class="score-buttons">
-                        <button class="score-btn" data-criterion="3" data-score="10">10</button>
-                        <button class="score-btn" data-criterion="3" data-score="9">9</button>
-                        <button class="score-btn" data-criterion="3" data-score="8">8</button>
-                        <button class="score-btn" data-criterion="3" data-score="7">7</button>
-                        <button class="score-btn" data-criterion="3" data-score="6">6</button>
-                        <button class="score-btn" data-criterion="3" data-score="5">5</button>
-                        <button class="score-btn" data-criterion="3" data-score="4">4</button>
-                    </div>
-                    <div class="descriptors" id="descriptors-3">
-                        <p><strong>10:</strong> Collegamenti multidisciplinari ricchi, pertinenti e originali</p>
-                        <p><strong>8-9:</strong> Collegamenti multidisciplinari corretti e significativi</p>
-                        <p><strong>6-7:</strong> Collegamenti multidisciplinari essenziali</p>
-                        <p><strong>4-5:</strong> Collegamenti multidisciplinari frammentari o assenti</p>
-                    </div>
-                </div>
-
-                <div class="evaluation-row">
-                    <div class="row-header" onclick="toggleDescriptors(4)">
-                        <div class="criterion">Competenze nell'uso delle lingue straniere</div>
-                        <div class="vote-display" id="vote-4">-</div>
-                    </div>
-                    <div class="score-buttons">
-                        <button class="score-btn" data-criterion="4" data-score="10">10</button>
-                        <button class="score-btn" data-criterion="4" data-score="9">9</button>
-                        <button class="score-btn" data-criterion="4" data-score="8">8</button>
-                        <button class="score-btn" data-criterion="4" data-score="7">7</button>
-                        <button class="score-btn" data-criterion="4" data-score="6">6</button>
-                        <button class="score-btn" data-criterion="4" data-score="5">5</button>
-                        <button class="score-btn" data-criterion="4" data-score="4">4</button>
-                    </div>
-                    <div class="descriptors" id="descriptors-4">
-                        <p><strong>10:</strong> Padronanza eccellente con espressione fluente e corretta</p>
-                        <p><strong>8-9:</strong> Padronanza buona con espressione corretta</p>
-                        <p><strong>6-7:</strong> Padronanza sufficiente con espressione essenziale</p>
-                        <p><strong>4-5:</strong> Padronanza limitata con espressione frammentaria</p>
-                    </div>
-                </div>
-
-                <div class="evaluation-row">
-                    <div class="row-header" onclick="toggleDescriptors(5)">
-                        <div class="criterion">Competenza in educazione civica</div>
-                        <div class="vote-display" id="vote-5">-</div>
-                    </div>
-                    <div class="score-buttons">
-                        <button class="score-btn" data-criterion="5" data-score="10">10</button>
-                        <button class="score-btn" data-criterion="5" data-score="9">9</button>
-                        <button class="score-btn" data-criterion="5" data-score="8">8</button>
-                        <button class="score-btn" data-criterion="5" data-score="7">7</button>
-                        <button class="score-btn" data-criterion="5" data-score="6">6</button>
-                        <button class="score-btn" data-criterion="5" data-score="5">5</button>
-                        <button class="score-btn" data-criterion="5" data-score="4">4</button>
-                    </div>
-                    <div class="descriptors" id="descriptors-5">
-                        <p><strong>10:</strong> Competenza eccellente con analisi critica e proposta originale</p>
-                        <p><strong>8-9:</strong> Competenza buona con analisi corretta</p>
-                        <p><strong>6-7:</strong> Competenza sufficiente con analisi essenziale</p>
-                        <p><strong>4-5:</strong> Competenza limitata con analisi superficiale</p>
-                    </div>
-                </div>
-
-                <div class="evaluation-row">
-                    <div class="row-header" onclick="toggleDescriptors(6)">
-                        <div class="criterion">Elaborato digitale (+ eventuale artefatto)</div>
-                        <div class="vote-display" id="vote-6">-</div>
-                    </div>
-                    <div class="score-buttons">
-                        <button class="score-btn" data-criterion="6" data-score="10">10</button>
-                        <button class="score-btn" data-criterion="6" data-score="9">9</button>
-                        <button class="score-btn" data-criterion="6" data-score="8">8</button>
-                        <button class="score-btn" data-criterion="6" data-score="7">7</button>
-                        <button class="score-btn" data-criterion="6" data-score="6">6</button>
-                        <button class="score-btn" data-criterion="6" data-score="5">5</button>
-                        <button class="score-btn" data-criterion="6" data-score="4">4</button>
-                    </div>
-                    <div class="descriptors" id="descriptors-6">
-                        <p><strong>10:</strong> Elaborato originale, ben strutturato e con contenuti approfonditi</p>
-                        <p><strong>8-9:</strong> Elaborato ben strutturato con contenuti validi</p>
-                        <p><strong>6-7:</strong> Elaborato sufficientemente strutturato con contenuti essenziali</p>
-                        <p><strong>4-5:</strong> Elaborato poco strutturato con contenuti limitati</p>
-                    </div>
-                </div>
+        <div class="rubric-section">
             </div>
-
-            <div class="chart-section">
-                <h2 class="section-title">Profilo delle Competenze</h2>
-                <div class="chart-container">
-                    <canvas id="radarChart"></canvas>
-                </div>
-            </div>
-        </div>
 
         <div class="summary-section">
-            <div class="average-display" id="average">-</div>
-            <div class="summary-text">Voto finale del colloquio</div>
+            <div class="summary-info">
+                <div class="average-display" id="average">-</div>
+                <div class="summary-text">Voto finale<br>del colloquio</div>
+            </div>
             <button class="reset-btn" onclick="resetAll()">Azzera valutazione</button>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="descriptorModal" onclick="closeModal(event)">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <button class="close-modal" onclick="closeModal(true)">&times;</button>
+            <h3 class="modal-title" id="modalTitle">Criterio</h3>
+            <div class="modal-body" id="modalBody">
+                </div>
         </div>
     </div>
 
     <script>
         let scores = {};
-        const criteriaLabels = [
-            'Argomentazione',
-            'Risoluzione problemi',
-            'Pensiero critico',
-            'Collegamento discipline',
-            'Lingue straniere',
-            'Educazione civica',
-            'Elaborato digitale'
-        ];
         
-        // Initialize radar chart
-        const ctx = document.getElementById('radarChart').getContext('2d');
-        const radarChart = new Chart(ctx, {
-            type: 'radar',
-            data: {
-                labels: criteriaLabels,
-                datasets: [{
-                    label: 'Competenze',
-                    data: [4, 4, 4, 4, 4, 4, 4],
-                    backgroundColor: 'rgba(52, 152, 219, 0.2)',
-                    borderColor: 'rgba(52, 152, 219, 1)',
-                    borderWidth: 2,
-                    pointBackgroundColor: 'rgba(52, 152, 219, 1)',
-                    pointRadius: 4
-                }]
+        // Dati dei criteri e descrittori
+        const criteriaData = [
+            {
+                title: "Capacità di argomentazione attraverso l'uso della lingua",
+                descriptors: [
+                    "<strong>10:</strong> Argomentazione ricca, articolata e originale con padronanza eccellente",
+                    "<strong>8-9:</strong> Argomentazione chiara e coerente con buona padronanza",
+                    "<strong>6-7:</strong> Argomentazione sufficientemente chiara con padronanza adeguata",
+                    "<strong>4-5:</strong> Argomentazione poco chiara con padronanza limitata"
+                ]
             },
-            options: {
-                scales: {
-                    r: {
-                        angleLines: {
-                            display: true
-                        },
-                        suggestedMin: 4,
-                        suggestedMax: 10,
-                        ticks: {
-                            stepSize: 1,
-                            callback: function(value) {
-                                if (value === 4 || value === 6 || value === 8 || value === 10) {
-                                    return value;
-                                }
-                            }
-                        }
-                    }
-                },
-                elements: {
-                    line: {
-                        tension: 0.1
-                    }
-                },
-                plugins: {
-                    legend: {
-                        display: false
-                    }
-                }
+            {
+                title: "Risoluzione dei problemi",
+                descriptors: [
+                    "<strong>10:</strong> Risoluzione creativa ed efficace con strategie innovative",
+                    "<strong>8-9:</strong> Risoluzione corretta con strategie appropriate",
+                    "<strong>6-7:</strong> Risoluzione parzialmente corretta con strategie semplici",
+                    "<strong>4-5:</strong> Difficoltà nella risoluzione con strategie inadeguate"
+                ]
+            },
+            {
+                title: "Pensiero critico e riflessivo",
+                descriptors: [
+                    "<strong>10:</strong> Analisi approfondita con riflessioni originali e autonome",
+                    "<strong>8-9:</strong> Analisi corretta con riflessioni pertinenti",
+                    "<strong>6-7:</strong> Analisi essenziale con riflessioni guidate",
+                    "<strong>4-5:</strong> Analisi superficiale con riflessioni limitate"
+                ]
+            },
+            {
+                title: "Collegamento organico e significativo tra le varie discipline",
+                descriptors: [
+                    "<strong>10:</strong> Collegamenti multidisciplinari ricchi, pertinenti e originali",
+                    "<strong>8-9:</strong> Collegamenti multidisciplinari corretti e significativi",
+                    "<strong>6-7:</strong> Collegamenti multidisciplinari essenziali",
+                    "<strong>4-5:</strong> Collegamenti multidisciplinari frammentari o assenti"
+                ]
+            },
+            {
+                title: "Competenze nell'uso delle lingue straniere",
+                descriptors: [
+                    "<strong>10:</strong> Padronanza eccellente con espressione fluente e corretta",
+                    "<strong>8-9:</strong> Padronanza buona con espressione corretta",
+                    "<strong>6-7:</strong> Padronanza sufficiente con espressione essenziale",
+                    "<strong>4-5:</strong> Padronanza limitata con espressione frammentaria"
+                ]
+            },
+            {
+                title: "Competenza in educazione civica",
+                descriptors: [
+                    "<strong>10:</strong> Competenza eccellente con analisi critica e proposta originale",
+                    "<strong>8-9:</strong> Competenza buona con analisi corretta",
+                    "<strong>6-7:</strong> Competenza sufficiente con analisi essenziale",
+                    "<strong>4-5:</strong> Competenza limitata con analisi superficiale"
+                ]
+            },
+            {
+                title: "Elaborato digitale (+ eventuale artefatto)",
+                descriptors: [
+                    "<strong>10:</strong> Elaborato originale, ben strutturato e con contenuti approfonditi",
+                    "<strong>8-9:</strong> Elaborato ben strutturato con contenuti validi",
+                    "<strong>6-7:</strong> Elaborato sufficientemente strutturato con contenuti essenziali",
+                    "<strong>4-5:</strong> Elaborato poco strutturato con contenuti limitati"
+                ]
             }
+        ];
+
+        // Inizializzazione Interfaccia
+        const rubricSection = document.querySelector('.rubric-section');
+        
+        criteriaData.forEach((criterion, index) => {
+            const rowHTML = `
+                <div class="evaluation-row">
+                    <div class="row-header" onclick="openModal(${index})">
+                        <div class="criterion">${criterion.title}</div>
+                        <div class="info-icon">ℹ️</div>
+                    </div>
+                    <div class="controls-wrapper">
+                        <div class="score-buttons">
+                            <button class="score-btn" data-criterion="${index}" data-score="4">4</button>
+                            <button class="score-btn" data-criterion="${index}" data-score="5">5</button>
+                            <button class="score-btn" data-criterion="${index}" data-score="6">6</button>
+                            <button class="score-btn" data-criterion="${index}" data-score="7">7</button>
+                            <button class="score-btn" data-criterion="${index}" data-score="8">8</button>
+                            <button class="score-btn" data-criterion="${index}" data-score="9">9</button>
+                            <button class="score-btn" data-criterion="${index}" data-score="10">10</button>
+                        </div>
+                        <div class="vote-display" id="vote-${index}">-</div>
+                    </div>
+                </div>
+            `;
+            rubricSection.insertAdjacentHTML('beforeend', rowHTML);
         });
-        
-        function toggleDescriptors(index) {
-            const descriptors = document.getElementById(`descriptors-${index}`);
-            descriptors.style.display = descriptors.style.display === 'block' ? 'none' : 'block';
-        }
-        
-        function updateScore(criterion, score) {
-            // Remove selection from all buttons in this criterion
+
+        // Gestione Voti
+        function updateScore(criterion, score, buttonElement) {
             const buttons = document.querySelectorAll(`[data-criterion="${criterion}"]`);
             buttons.forEach(btn => btn.classList.remove('selected'));
             
-            // Add selection to clicked button
-            event.target.classList.add('selected');
-            
-            // Update score
+            buttonElement.classList.add('selected');
             scores[criterion] = score;
-            
-            // Update vote display
             document.getElementById(`vote-${criterion}`).textContent = score;
             
-            // Update radar chart
-            updateRadarChart();
-            
-            // Update average
             updateAverage();
         }
-        
-        function updateRadarChart() {
-            const data = [];
-            for (let i = 0; i < criteriaLabels.length; i++) {
-                data.push(scores[i] || 4);
-            }
-            radarChart.data.datasets[0].data = data;
-            radarChart.update();
-        }
-        
+
         function updateAverage() {
             const validScores = Object.values(scores).filter(score => score !== null);
-            
             if (validScores.length === 0) {
                 document.getElementById('average').textContent = '-';
                 return;
@@ -512,45 +424,44 @@
             
             const sum = validScores.reduce((acc, score) => acc + score, 0);
             const average = (sum / validScores.length).toFixed(1);
-            
             document.getElementById('average').textContent = average;
         }
-        
+
         function resetAll() {
-            // Clear scores
             scores = {};
-            
-            // Remove all selections
-            document.querySelectorAll('.score-btn').forEach(btn => {
-                btn.classList.remove('selected');
-            });
-            
-            // Reset vote displays
+            document.querySelectorAll('.score-btn').forEach(btn => btn.classList.remove('selected'));
             for (let i = 0; i < 7; i++) {
                 document.getElementById(`vote-${i}`).textContent = '-';
             }
-            
-            // Reset average
             document.getElementById('average').textContent = '-';
-            
-            // Reset radar chart
-            radarChart.data.datasets[0].data = [4, 4, 4, 4, 4, 4, 4];
-            radarChart.update();
-            
-            // Hide all descriptors
-            document.querySelectorAll('.descriptors').forEach(el => {
-                el.style.display = 'none';
-            });
         }
-        
-        // Add event listeners to all score buttons
+
+        // Event Listeners per i pulsanti
         document.querySelectorAll('.score-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
-                const criterion = parseInt(e.target.dataset.criterion);
-                const score = parseInt(e.target.dataset.score);
-                updateScore(criterion, score);
+                const criterion = parseInt(e.currentTarget.dataset.criterion);
+                const score = parseInt(e.currentTarget.dataset.score);
+                updateScore(criterion, score, e.currentTarget);
             });
         });
+
+        // Gestione Modal
+        const modal = document.getElementById('descriptorModal');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalBody = document.getElementById('modalBody');
+
+        function openModal(index) {
+            const data = criteriaData[index];
+            modalTitle.textContent = data.title;
+            modalBody.innerHTML = data.descriptors.map(desc => `<p>${desc}</p>`).join('');
+            modal.style.display = 'flex';
+        }
+
+        function closeModal(force = false) {
+            if (force === true || force.target === modal) {
+                modal.style.display = 'none';
+            }
+        }
     </script>
 </body>
 </html>
