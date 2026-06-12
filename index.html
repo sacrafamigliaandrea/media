@@ -11,14 +11,12 @@
             --accent-color: #e74c3c;
             --light-gray: #f8f9fa;
             --dark-gray: #343a40;
-            --success-color: #27ae60;
         }
 
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            /* Previene la selezione accidentale del testo durante il touch sui bottoni */
             user-select: none; 
         }
 
@@ -26,22 +24,21 @@
             font-family: '-apple-system', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
             background-color: #e2e8f0;
             color: var(--primary-color);
-            /* Forza la pagina ad occupare esattamente l'altezza dello schermo, impedendo lo scroll */
             height: 100dvh; 
             width: 100vw;
             overflow: hidden;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 12px;
+            padding: 8px; /* Padding globale ridotto */
         }
 
         .container {
             width: 100%;
             height: 100%;
             background: white;
-            border-radius: 16px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
             display: flex;
             flex-direction: column;
             overflow: hidden;
@@ -50,20 +47,20 @@
         .header {
             background: var(--primary-color);
             color: white;
-            padding: 15px 20px;
+            padding: 10px 15px; /* Compresso */
             text-align: center;
-            border-bottom: 4px solid var(--secondary-color);
+            border-bottom: 3px solid var(--secondary-color);
             flex-shrink: 0;
         }
 
         .header h1 {
-            font-size: 1.6rem;
+            font-size: 1.3rem; /* Ridotto */
             font-weight: 700;
-            margin-bottom: 4px;
+            margin-bottom: 2px;
         }
 
         .header p {
-            font-size: 1.1rem;
+            font-size: 0.95rem; /* Ridotto */
             opacity: 0.9;
         }
 
@@ -71,18 +68,19 @@
             flex-grow: 1;
             display: flex;
             flex-direction: column;
-            justify-content: space-evenly; /* Distribuisce le righe equamente nello spazio verticale */
-            padding: 10px 20px;
+            justify-content: space-evenly; 
+            padding: 5px 15px; /* Compresso */
+            gap: 4px; /* Gap minimo tra le righe */
         }
 
         .evaluation-row {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 12px 18px;
+            padding: 8px 12px; /* Molto compresso */
             background: var(--light-gray);
-            border-radius: 12px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+            border-radius: 10px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.02);
         }
 
         .row-header {
@@ -90,46 +88,46 @@
             align-items: center;
             cursor: pointer;
             flex: 1;
-            padding-right: 15px;
+            padding-right: 10px;
         }
 
         .criterion {
             font-weight: 600;
-            font-size: 1.15rem;
-            line-height: 1.3;
+            font-size: 1rem; /* Ridotto */
+            line-height: 1.1;
             color: var(--primary-color);
         }
 
         .info-icon {
             color: var(--secondary-color);
-            margin-left: 8px;
-            font-size: 1.2rem;
+            margin-left: 6px;
+            font-size: 1.1rem;
             flex-shrink: 0;
         }
 
         .controls-wrapper {
             display: flex;
             align-items: center;
-            gap: 20px;
+            gap: 12px; /* Ridotto */
         }
 
         .score-buttons {
             display: flex;
-            gap: 10px;
+            gap: 6px; /* Ridotto */
         }
 
-        /* Pulsanti touch-friendly per iPad (grandi) */
+        /* Pulsanti touch-friendly ma compatti per iPad */
         .score-btn {
-            width: 55px;
-            height: 55px;
+            width: 44px; /* Ridotto (limite minimo Apple per il touch) */
+            height: 44px; /* Ridotto */
             border: 2px solid #cbd5e1;
             background: white;
-            border-radius: 12px;
-            font-size: 1.25rem;
+            border-radius: 8px;
+            font-size: 1.1rem;
             font-weight: 700;
             color: var(--primary-color);
             cursor: pointer;
-            transition: all 0.15s ease;
+            transition: all 0.1s ease;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -143,28 +141,27 @@
             background: var(--primary-color);
             color: white;
             border-color: var(--primary-color);
-            box-shadow: 0 4px 10px rgba(44, 62, 80, 0.3);
+            box-shadow: 0 2px 5px rgba(44, 62, 80, 0.3);
         }
 
         .vote-display {
-            width: 60px;
-            height: 60px;
+            width: 46px; /* Ridotto */
+            height: 46px; /* Ridotto */
             background: var(--secondary-color);
             color: white;
-            border-radius: 14px;
+            border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.6rem;
+            font-size: 1.3rem; /* Ridotto */
             font-weight: 800;
-            box-shadow: inset 0 -3px 0 rgba(0,0,0,0.1);
         }
 
         .summary-section {
             background: var(--primary-color);
             color: white;
-            padding: 15px 30px;
-            border-top: 4px solid var(--secondary-color);
+            padding: 10px 20px; /* Compresso */
+            border-top: 3px solid var(--secondary-color);
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -174,23 +171,24 @@
         .summary-info {
             display: flex;
             align-items: center;
-            gap: 20px;
+            gap: 15px;
         }
 
         .average-display {
-            font-size: 2.8rem;
+            font-size: 2.2rem; /* Ridotto */
             font-weight: 800;
             color: white;
             background: rgba(255,255,255,0.1);
-            padding: 5px 20px;
-            border-radius: 12px;
-            min-width: 100px;
+            padding: 4px 15px;
+            border-radius: 10px;
+            min-width: 80px;
             text-align: center;
         }
 
         .summary-text {
-            font-size: 1.3rem;
+            font-size: 1.1rem; /* Ridotto */
             font-weight: 500;
+            line-height: 1.2;
             opacity: 0.9;
         }
 
@@ -198,21 +196,20 @@
             background: var(--accent-color);
             color: white;
             border: none;
-            padding: 16px 30px;
-            border-radius: 30px;
-            font-size: 1.2rem;
+            padding: 12px 24px; /* Compresso */
+            border-radius: 20px;
+            font-size: 1.1rem;
             font-weight: 700;
             cursor: pointer;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
         }
 
         .reset-btn:active {
             background: #c0392b;
             transform: translateY(2px);
-            box-shadow: 0 2px 3px rgba(0,0,0,0.2);
         }
 
-        /* --- STILI PER IL MODAL DEI DESCRITTORI --- */
+        /* Modal Descrittori (invariato) */
         .modal-overlay {
             position: fixed;
             top: 0;
@@ -232,23 +229,23 @@
             width: 80%;
             max-width: 600px;
             border-radius: 16px;
-            padding: 30px;
-            box-shadow: 0 15px 30px rgba(0,0,0,0.3);
+            padding: 25px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
             position: relative;
         }
 
         .modal-title {
-            font-size: 1.4rem;
+            font-size: 1.3rem;
             color: var(--primary-color);
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             padding-bottom: 10px;
             border-bottom: 2px solid var(--secondary-color);
         }
 
         .modal-body p {
-            margin-bottom: 12px;
-            font-size: 1.15rem;
-            line-height: 1.5;
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+            line-height: 1.4;
             color: var(--dark-gray);
         }
 
@@ -260,14 +257,14 @@
 
         .close-modal {
             position: absolute;
-            top: 20px;
-            right: 20px;
+            top: 15px;
+            right: 15px;
             background: #f1f5f9;
             border: none;
-            width: 40px;
-            height: 40px;
+            width: 36px;
+            height: 36px;
             border-radius: 50%;
-            font-size: 1.5rem;
+            font-size: 1.4rem;
             font-weight: bold;
             color: var(--dark-gray);
             cursor: pointer;
@@ -293,7 +290,7 @@
                 <div class="average-display" id="average">-</div>
                 <div class="summary-text">Voto finale<br>del colloquio</div>
             </div>
-            <button class="reset-btn" onclick="resetAll()">Azzera valutazione</button>
+            <button class="reset-btn" onclick="resetAll()">Azzera</button>
         </div>
     </div>
 
@@ -309,7 +306,6 @@
     <script>
         let scores = {};
         
-        // Dati dei criteri e descrittori
         const criteriaData = [
             {
                 title: "Capacità di argomentazione attraverso l'uso della lingua",
@@ -376,7 +372,6 @@
             }
         ];
 
-        // Inizializzazione Interfaccia
         const rubricSection = document.querySelector('.rubric-section');
         
         criteriaData.forEach((criterion, index) => {
@@ -403,7 +398,6 @@
             rubricSection.insertAdjacentHTML('beforeend', rowHTML);
         });
 
-        // Gestione Voti
         function updateScore(criterion, score, buttonElement) {
             const buttons = document.querySelectorAll(`[data-criterion="${criterion}"]`);
             buttons.forEach(btn => btn.classList.remove('selected'));
@@ -436,7 +430,6 @@
             document.getElementById('average').textContent = '-';
         }
 
-        // Event Listeners per i pulsanti
         document.querySelectorAll('.score-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 const criterion = parseInt(e.currentTarget.dataset.criterion);
@@ -445,7 +438,6 @@
             });
         });
 
-        // Gestione Modal
         const modal = document.getElementById('descriptorModal');
         const modalTitle = document.getElementById('modalTitle');
         const modalBody = document.getElementById('modalBody');
